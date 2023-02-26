@@ -1,0 +1,529 @@
+<html>
+  <head>
+    <title></title>
+    <script language="Javascript" type="text/javascript" src="./common.js"></script>
+    <script language="Javascript" type="text/javascript" src="./item.js"></script>
+    <script language="Javascript" type="text/javascript" src="./menu.js"></script>
+    <script language="Javascript" type="text/javascript">
+        // global variables (TODO: put these somewhere else? TODO: and maybe just have one global variable with members?)
+        var title; // TODO: replace this global with document.title
+        var counter = 0; // number of copies from this window performed so far
+        var activeItem; // active instance of Item class (item.js)
+        var activeColumn = 0; // the column that was clicked on more recently
+        var activeRow = 0; // the row that was clicked on more recently
+        var menuIDs = ["tableau_menu", "column_menu", "row_menu", "entry_menu"];
+        var chars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+                     "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+
+        // get title
+        title = getURLParam("title");
+        title = (title !== "" ? title : chars[0]); // dedault title is "A"
+        document.title = title;
+
+        function init() {
+            deselectRadio(document.forms.editform.elements.sign);
+            deselectRadio(document.forms.editform.elements.type);
+            document.getElementById("eVariables").value = "";
+            document.getElementById("eConstraints").value = "";
+            document.getElementById("cRows").value = "";
+            document.getElementById("cColumns").value = "";
+
+            var params = makeUrlParams();
+            // construct Item with URL parameters
+            activeItem = new Item(params);
+
+            // add the new item to the html (TODO: can we avoid this if there's no real item?)
+            document.getElementById("main").appendChild(activeItem.div);
+
+            // add universal click handler
+            document.onclick = hideAllMenus;
+            // TODO: is this necessary?
+            scroll(0, 0);
+
+            // TODO: should we have done this before constructing a new Item?
+            if (params.type === "copypaste") {
+                copyPasteTableau();
+            } else if (params.tableau === undefined) {
+                promptSize();
+            }
+        }
+    </script>
+    <style type="text/css">
+body {
+   background-color: #ffffff;
+}
+
+.inpt {
+  float: left;
+  text-align: right;
+  width: 64px;
+  height: 24px;
+  border: 1px solid white;
+  font-size: 14px;
+}
+
+td {
+   border: 0;
+   padding: 0;
+   margin: 0;
+}
+
+.tableauBtn {
+   border: 2px outset #dddddd;
+   width: 60px;
+   height: 20px;
+   font-size: 14px;
+   font-weight: 700;
+   text-align: center;
+   color: #000000;
+   background-color: #dddddd;
+   vertical-align: middle;
+   cursor: pointer;
+}
+
+.rowBtn {
+   border: 2px outset #dddddd;
+   width: 60px;
+   height: 20px;
+   margin: 3px 0 2px 0;
+   font-size: 14px;
+   text-align: center;
+   background-color: #dddddd;
+   cursor: pointer;
+}
+
+.columnBtn {
+   border: 2px outset #dddddd;
+   width: 60px;
+   height: 20px;
+   margin: 0 3px 0 2px;
+   font-size: 14px;
+   font-weight: bold;
+   text-align: center;
+   background-color: #dddddd;
+   cursor: pointer;
+}
+
+.colLineBtn {
+   cursor: pointer;
+   background-color: #000000;
+   margin: 0;
+   width: 2px;
+   height: 24px;
+}
+
+.colLine {
+   background-color: #ffffff;
+   width: 2px;
+   height: 30px;
+}
+
+.rowLineBtn {
+   cursor: pointer;
+   background-color: #000000;
+   margin: 0;
+   height: 2px;
+   width: 100%;
+}
+
+.rowLine {
+   background-color: #ffffff;
+   height: 2px;
+   margin: 0;
+   width: 100%;
+}
+
+.doneBtn {
+}
+
+.cancelBtn {
+}
+
+.contextMenu {
+  cursor: pointer;
+  position: absolute;
+  visibility: hidden;
+  border: 1px solid black;
+}
+
+.menu {
+  border: 0;
+  background-color: black;
+  border-spacing: 2px;
+}
+
+.menuItem {
+  padding: 0 10px 0 10px;
+  background-color: #dddddd;
+  font-size: 12;
+  font-weight: bold;
+  font-family: arial;
+}
+
+.menuFont {
+}
+
+.green {
+  color: #00cc00;
+  font-weight: bold;
+}
+
+.red {
+  color: #cc0000;
+  font-weight: bold;
+}
+
+#sizePrompt {
+  visibility: hidden;
+  width: 600;
+  height: 200;
+  position: absolute;
+  background-color: #ffffff;
+  text-align: left;
+}
+
+#copyPaste {
+  visibility: hidden;
+  width: 600px;
+  height: 200px;
+  position: absolute;
+  background-color: #ffffff;
+  text-align: left;
+}
+
+#cTextarea {
+  visibility: hidden;
+  width: 600px;
+}
+
+#cancel {
+  width: 100px;
+}
+
+#done {
+  width: 100px;
+}
+
+.quarter {
+  text-align: center;
+  float: left;
+  width: 25%;
+}
+
+.half {
+  text-align: center;
+  float: left;
+  width: 50%;
+}
+
+.half li {
+  text-align: left;
+  width: 200px;
+}
+
+.lefty {
+   /*display: inline-block;*/
+   display: -moz-inline-box;
+   width: 100px;
+}
+
+#first {
+  float: left;
+  width: 50%;
+}
+
+#second {
+  display: none;
+  float: right;
+  width: 50%;
+}
+
+#third {
+  display: none;
+  float: left;
+  width: 100%;
+  border: 0px;
+}
+fieldset {
+  border: none;
+}
+
+li {
+  list-style: none;
+}
+
+#third div {
+  float: left;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+#infoText {
+  visibility: hidden;
+  width: 600px;
+  height: 200px;
+  position: absolute;
+  background-color: #ffffff;
+  text-align: left;
+}
+
+#infoTextarea {
+  visibility: hidden;
+  width: 600px;
+}
+
+    </style>
+  </head>
+<body onload="init();" onkeypress="wasEscPressed(event);" leftmargin="100" topmargin="10">
+  <div id="main" style="">
+  </div>
+  <div style="background-color: white; height: 700px;" />
+
+
+
+
+<div id="sizePrompt">
+  <form name="editform" id="editform">
+  <div id="first">
+    <fieldset>
+      <ol>
+        <li><label><input type="radio" id="s1" name="sign" value="Inequalities" onclick="showSecondThird();" />Inequalities</label></li>
+        <li><label><input type="radio" id="s2" name="sign" value="Equalities" onclick="showSecondThird();" />Equalities</label></li>
+        <li><label><input type="radio" id="s3" name="sign" value="Empty" onclick="choose_empty();" />Empty</label></li>
+      </ol>
+    </fieldset>
+  </div>
+
+  <script type="text/javascript">
+  function showSecondThird() {
+    document.getElementById("second").style.display = "inline";
+    document.getElementById("third").style.display = "inline";
+    deselectRadio(document.forms["editform"].elements["type"]);
+  }
+  function hideSecondThird() {
+    document.getElementById("second").style.display = "none";
+    document.getElementById("third").style.display = "none";
+  }
+  </script>
+
+  <div id="second">
+    <fieldset>
+      <ol>
+        <li><label><input type="radio" id="t1" name="type" value="LOP" />LOP</label></li>
+        <li><label><input type="radio" id="t2" name="type" value="System" />System</label></li>
+      </ol>
+    </fieldset>
+  </div>
+
+  <div id="third">
+    <fieldset>
+      <div><label>Variables:&nbsp;<input id="eVariables" value="" size="5" onkeypress="if (getKey(event) == 13) promptValidate();" /></label></div>
+      <div><label>Constraints:&nbsp;<input id="eConstraints" value="" size="5" onkeypress="if (getKey(event) == 13) promptValidate();" /></label></div>
+      <div><input class="doneBtn" type="button" value="Done" onclick="promptValidate();" /></div>
+    </fieldset><!-- id="done" -->
+  </div>
+  </form>
+</div>
+<script type="text/javascript">
+// TODO: move these functions somewhere else
+function showSizePrompt() { document.getElementById("sizePrompt").style.visibility = "visible"; }
+function hideSizePrompt() { document.getElementById("sizePrompt").style.visibility = "hidden"; }
+</script>
+
+<div id="infoText">
+  <textarea id="infoTextarea" wrap="off" rows="12" cols="73"></textarea>
+  <input class="doneBtn" type="button" value="Done" onclick="hideInfoText();showActiveTb();" />
+</div><!--  id="done" -->
+<script type="text/javascript">
+function showInfoText() {
+   var d = document.getElementById("infoText");
+   d.style.left = findPosX(activeItem.tb.parentNode) + "px";
+   d.style.top = findPosY(activeItem.tb.parentNode) + "px";
+   d.style.visibility = "visible";
+   document.getElementById("infoTextarea").style.visibility = "visible";
+   document.getElementById("infoTextarea").style.display = "inline";
+}
+function hideInfoText() {
+   document.getElementById("infoText").style.visibility = "hidden";
+   document.getElementById("infoTextarea").style.visibility = "hidden";
+   document.getElementById("infoTextarea").style.display = "none";
+}
+</script>
+
+
+
+
+<div id="copyPaste">
+  <textarea id="cTextarea" wrap="off" rows="12" cols="73"></textarea>
+  <div class="quarter">
+    <input class="cancelBtn" id="cancel" type="button" value="Cancel" onclick="cancelCopyPaste();" />
+  </div>
+  <div class="half">
+    <fieldset>
+      <ol>
+        <li>
+          <label for="cRows" class="lefty">Rows:&nbsp;</label>
+          <input id="cRows" value="" size="5" onkeypress="if (getKey(event) == 13) copyValidate();" />
+        </li>
+        <li>
+          <label class="lefty">Columns:&nbsp;</label>
+          <input id="cColumns" value="" size="5" onkeypress="if (getKey(event) == 13) copyValidate();" />
+        </li>
+        <li>
+          <input id="readBc" type="checkbox">Read basic coefficient</input>
+        </li>
+      </ol>
+    </fieldset>
+  </div>
+  <div class="quarter">
+        <input class="doneBtn" type="button" value="Done" onclick="copyValidate();" />
+  </div>
+</div>
+<script type="text/javascript">
+function showCopyPaste() {
+   var d = document.getElementById("copyPaste");
+
+   d.style.left = findPosX(activeItem.tb.parentNode) + "px";
+   d.style.top = findPosY(activeItem.tb.parentNode) + "px";
+
+   d.style.visibility = "visible";
+   document.getElementById("cTextarea").style.visibility = "visible";
+   document.getElementById("cTextarea").focus();
+}
+
+function hideCopyPaste() {
+   document.getElementById("copyPaste").style.visibility = "hidden";
+   document.getElementById("cTextarea").style.visibility = "hidden";
+}
+</script>
+
+
+
+
+
+
+<div id="entry_menu" class="contextMenu" onmouseover="highlight(event)" onmouseout="lowlight(event)">
+  <div class="menuItem" onclick="javascript:pivotEntry();">Pivot on Entry</div>
+  <div class="menuItem" onclick="javascript:highlightEntry();">Highlight Entry</div>
+  <div class="menuItem" onclick="javascript:addRowAndColumnAfter();">Add Row and Column After</div>
+  <div class="menuItem" onclick="javascript:deleteRowAndColumn();">Delete Row and Column</div>
+  <div class="menuItem" onclick="javascript:fillEntry(0);">Make Entry 0</div>
+  <div class="menuItem" onclick="javascript:fillEntry(1);">Make Entry 1</div>
+</div>
+
+
+<div id="column_menu" class="contextMenu" onmouseover="highlight(event)" onmouseout="lowlight(event)">
+  <div class="menuItem" onclick="javascript:highlightColumn();">Highlight Column</div>
+  <div class="menuItem" onclick="javascript:deleteColumn();">Delete Column</div>
+  <div class="menuItem" onclick="javascript:addColumnBefore();">Add Column Before</div>
+  <div class="menuItem" onclick="javascript:addColumnAfter();">Add Column After</div>
+  <div class="menuItem" onclick="javascript:fillColumn(0);">Fill Column with 0s</div>
+  <div class="menuItem" onclick="javascript:fillColumn(1);">Fill Column with 1s</div>
+  <div class="menuItem" onclick="javascript:markAsFree();">Free Variable</div>
+</div>
+
+
+<div id="row_menu" class="contextMenu" onmouseover="highlight(event)" onmouseout="lowlight(event)">
+  <div class="menuItem" onclick="javascript:highlightRow();">Highlight Row</div>
+  <div class="menuItem" onclick="javascript:deleteRow();">Delete Row</div>
+  <div class="menuItem" onclick="javascript:addRowBefore();">Add Row Before</div>
+  <div class="menuItem" onclick="javascript:addRowAfter();">Add Row After</div>
+  <div class="menuItem" onclick="javascript:fillRow(0);">Fill Row with 0s</div>
+  <div class="menuItem" onclick="javascript:fillRow(1);">Fill Row with 1s</div>
+  <div class="menuItem" onclick="javascript:markAsEquality();">Mark as Equality</div>
+</div>
+
+
+<div id="tableau_menu" class="contextMenu" onmouseover="highlight(event)" onmouseout="lowlight(event)">
+  <div class="menuItem" onclick="javascript:highlightTableau();">Highlight Tableau</div>
+  <div class="menuItem" onclick="javascript:wider();">Wider</div>
+  <div class="menuItem" onclick="javascript:thinner();">Thinner</div>
+  <div class="menuItem" onclick="javascript:fillTableau(0);">Fill Tableau with 0s</div>
+  <div class="menuItem" onclick="javascript:copyPasteTableau();">Copy / Paste Tableau</div>
+  <div class="menuItem" onclick="javascript:copyTableauNewWindow();">Copy Tableau to New Window</div>
+  <div class="menuItem" onclick="javascript:newTableauTabFormat();">New Tableau, Tab Format</div>
+  <div class="menuItem" onclick="javascript:newTableauPasteFormat();">New Tableau, Paste Format</div>
+  <div class="menuItem" onclick="javascript:convertToLaTeX();">Convert to Latex</div>
+  <div class="menuItem" onclick="javascript:convertToMaple();">Convert to Maple</div>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">
+
+//set this variable to 1 if you wish the URLs of the highlighted menu to be displayed in the status bar
+var ie = document.all;
+var ns = ! document.all;
+
+function showmenu(e) {
+    hideAllMenus();
+    activeItem = this.item;
+    activeRow = this.row * 2 + 1;
+    activeColumn = this.col * 2 + 1;
+
+    //Find out which menu to show
+    e = (e) ? e : ((event) ? event : null);
+    if (e) {
+        var elem = (e.target) ? e.target : e.srcElement;
+        var menuobj = document.getElementById(elem.kind + "_menu");
+
+        //Find out how close the mouse is to the corner of the window
+        var rightedge = ie ? document.body.clientWidth - event.clientX : window.innerWidth - e.clientX;
+        var bottomedge = ie ? document.body.clientHeight - event.clientY : window.innerHeight - e.clientY;
+
+        //if the horizontal distance isn't enough to accomodate the width of the context menu
+        if (rightedge < menuobj.offsetWidth) {
+            //move the horizontal position of the menu to the left by it's width
+            menuobj.style.left = ie ? document.body.scrollLeft + event.clientX - menuobj.offsetWidth : window.pageXOffset + e.clientX - menuobj.offsetWidth;
+        } else {
+            //position the horizontal position of the menu where the mouse was clicked
+            menuobj.style.left = ie ? document.body.scrollLeft + event.clientX : window.pageXOffset + e.clientX;
+        }
+
+        //same concept with the vertical position
+        if (bottomedge < menuobj.offsetHeight) {
+            menuobj.style.top = ie ? document.body.scrollTop + event.clientY - menuobj.offsetHeight : window.pageYOffset + e.clientY - menuobj.offsetHeight;
+        } else {
+            menuobj.style.top = ie ? document.body.scrollTop + event.clientY : window.pageYOffset + e.clientY;
+        }
+        menuobj.style.visibility = "visible";
+    }
+    return false;
+}
+
+function hidemenu(e) {
+   menuobj.style.visibility = "hidden";
+}
+
+function highlight(e) {
+   var firingobj = ie ? event.srcElement : e.target;
+   if (firingobj.className == "menuItem" || ns && firingobj.parentNode.className == "menuItem") {
+      if (ns && firingobj.parentNode.className == "menuItem") {
+         firingobj = firingobj.parentNode; //up one node
+      }
+      firingobj.style.backgroundColor = "#3355ff";
+      firingobj.style.color = "white";
+   }
+}
+
+function lowlight(e) {
+   var firingobj = ie ? event.srcElement : e.target;
+   if (firingobj.className == "menuItem" || ns && firingobj.parentNode.className == "menuItem") {
+      if (ns && firingobj.parentNode.className == "menuItem") {
+         firingobj = firingobj.parentNode; //up one node
+      }
+      firingobj.style.backgroundColor = "";
+      firingobj.style.color = "black";
+      window.status = "";
+   }
+}
+
+function hideAllMenus() {
+   for (x = 0; x < menuIDs.length; x++) {
+      document.getElementById(menuIDs[x]).style.visibility = "hidden";
+   }
+}
+
+</script>
+</body>
+</html>
+

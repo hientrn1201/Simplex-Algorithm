@@ -1,0 +1,129 @@
+<html><head><title>Online Simplex Help</title>
+<script type="text/javascript">
+var c = 0;
+var chars = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
+             'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+function launch() {
+   window.open('tableau.html?title=' + chars[c++]);
+}
+</script>
+    
+    <style type="text/css">
+body {
+  font-family: 'Trebuchet MS', Verdana, Helvetica,sans-serif, Arial;
+}
+#green {
+  color: #00aa00;
+  font-weight: bold;
+}
+
+#red {
+  color: #aa0000;
+  font-weight: bold;
+}
+
+    </style></head><body bgcolor="white">
+<p style="float: right;"><a href="#" onclick="javascript:launch();">Launch WebSim</a></p>
+<h3>Introduction</h3>
+
+<p><b>WebSim is</b> a program that uses the simplex method to solve Linear Optimization Problems.</p>
+
+<p><b>Browser Requirements</b> - WebSim is developed and tested in Mozilla browsers (Firefox and Camino), but <i>should</i> work the same in Internet Explorer and Safari. For best results, make sure you are running Firefox version 1.5.0.4 or later. This can be downloaded from <a href="http://mozilla.com/firefox">mozilla.com</a>.</p>
+
+<p>Because WebSim tends to open a lot of windows if you have multiple tableaux open, it's best to use a browser that supports 'tabbed browsing'. In Firefox, go to the menu <b>Tools > Options</b>, select Advanced and click on Tabbed Browsing. Select <b>Force links that open new windows to open in:</b> and select <b>a new tab</b>.</p>
+
+<p> If you discover any bugs with the way WebSim works, please send a detailed email to jake.hawkes@gmail.com</p> 
+
+<p><b>Download WebSim</b> - Due to overwhelming popular demand, WebSim is available for download. Simply download the <a href="websim.zip">downloadable version</a>, unzip it, and open the file "sim.html" in a browser.</p>
+
+<br/>
+<h3>The Basics</h3>
+<p><b>To begin</b>, click on the "Launch WebSim" link in the upper right hand corner. This will pop up a new tab with a simple form, prompting you to choose whether the problem consists of inequalities or equalities. A third option, "Empty", allows you to simply paste an existing tableau that you might have copied from Maple or a word processing program.</p>
+
+<p>After you have selected the type of equations in your problem, a few more prompts show up. One of these allows you to choose whether the problem is a linear optimization problem (LOP) or a system of equations. The only difference between the two types of problems is that a LOP will contain a 'Z-column' and an objective row, whereas a system will not. You are also prompted to enter the number of variables and constraints in the problem, after which you should click "Done".</p>
+
+<p>At this point a table pops up with the slack variables filled in (and the Z-column as well if the problem is a LOP). The table of numbers in the middle represents a tableau which can be edited or pivoted on at any time. The buttons to the left and above the tableau are used for popping up menus. In order to pop-up a menu, simply right-click any button or entry. The button above and to the left is called the "tableau button", the buttons directly above the tableau are called "column buttons", and the buttons directly to the left of the tableau are called "row buttons".</p>
+
+<p><b>Pivoting</b> can be accomplished simply by double-clicking
+on the entry on which you wish to pivot. The resulting tableau will
+appear beneath the current tableau, and the page will automatically
+scroll to show only the resulting tableau.</p>
+<br />
+
+<h3>The Menus!</h3>
+<p>There are four different menus.
+</p><ul>
+  <li><b>Entry Menu</b> - shows up when you right-click on any entry.</li>
+  <li><b>Column Menu</b> - shows up when you right-click on any button above the tableau.</li>
+  <li><b>Row Menu</b> - shows up when you right-click on any button to the left of the tableau.</li>
+  <li><b>Tableau Menu</b> - show up when you right-click on the button above and to the left of the tableau.</li>
+</ul>
+
+
+<h4>Entry Menu</h4>
+<p></p><ul>
+  <li><b>Pivot on Entry</b> - Pivots on the entry which you
+right-clicked. The resulting tableau will appear beneath the current
+tableau, and the page will automatically scroll to show only the
+resulting tableau.</li>
+  <li><b>Highlight Entry</b> - Highlights the entry on which you right-clicked. This simply changes the background of the given entry to a light-gray color.</li>
+  <li><b>Make Entry 0</b> - Changes the value of the entry to zero.</li>
+  <li><b>Make Entry 1</b> - Changes the value of the entry to one.</li>
+</ul><p></p>
+
+<h4>Column Menu</h4>
+<p></p><ul>
+  <li><b>Highlight Column</b> - Highlights all the entries in the column.</li>
+  <li><b>Delete Column</b> - Deletes the column.</li>
+  <li><b>Add Column Before</b> - Adds a column before this column and sets all entries in it to zero.</li>
+  <li><b>Add Column After</b> - Adds a column after this column and sets all entries in it to zero.</li>
+  <li><b>Fill Column with 0s</b> - Changes all entries in this column to zero.</li>
+  <li><b>Fill Column with 1s</b> - Changes all entries in this column to one.</li>
+  <li><b>Free Variable</b> - Marks this column as a free variable by putting a green <b>F</b> on the column button. The <b>F</b> will remain green until an entry in this column is pivoted on, at which point the <b>F</b> will become red and remain red.</li>
+</ul><p></p>
+
+<h4>Row Menu</h4>
+<p></p><ul>
+  <li><b>Highlight Row</b> - Highlights all the entries in the row.</li>
+  <li><b>Delete Row</b> - Deletes the row.</li>
+  <li><b>Add Row Before</b> - Adds a row before this row and sets all entries in it to zero.</li>
+  <li><b>Add Row After</b> - Adds a row after this row and sets all entries in it to zero.</li>
+  <li><b>Fill Row with 0s</b> - Changes all entries in this row to zero.</li>
+  <li><b>Fill Row with 1s</b> - Changes all entries in this row to one.</li>
+  <li><b>Mark as Equality</b> - Marks this row as an equality by putting a green <b>E</b> on the row button. The <b>E</b> will remain green until an entry in this row is pivoted on, at which point the <b>E</b> will become red and remain red.</li>
+</ul><p></p>
+
+<h4>Tableau Menu</h4>
+<p></p><ul>
+  <li><b>Highlight Tableau</b> - Highlights all the entries in the tableau.</li>
+  <li><b>Wider</b> - Makes all the columns wider (to a point) to show extremely large numbers.</li>
+  <li><b>Thinner</b> - Makes all the columns thinner (to a point) to show more columns when the entries are small. This is especially useful in network problems.</li>
+  <li><b>Fill Tableau with 0s</b> - Changes all entries in the tableau to zero.</li>
+  <li><b>Copy / Paste Tableau</b>
+- Opens a large text area where you can freely select and copy or paste
+an entire tableau from your favorite word-processing program. After you
+paste a tableau, you can enter the dimensions of the tableau and click
+done, and Sim will create a tableau similar to the ones you've seen out
+of your data.</li>
+
+  <li><b>Copy Tableau to New Window</b> - Opens a new window with the current tableau in it.</li>
+  <li><b>New Tableau, Tab Format</b> - Opens a new
+window which will prompt you to enter the number of variables and
+constraints in a Linear Optimization Problem, and will create a tableau
+for you with the slack variables and the z-column values already
+entered in. Note: This is the exact same setup you see when you first
+come to the page.</li>
+  <li><b>New Tableau, Paste Format</b> - Opens a
+new window with a text area into which you can paste an entire tableau
+from your favorite word-processing program. After you paste a tableau,
+you can enter the dimensions of the tableau and click done, and Sim
+will create a tableau similar to the ones you've seen out of your data.
+Note: This basically opens a new window with a tableau in copy / paste
+format.</li>
+  <li><b>Convert to Latex</b> - Shows a large input box that contains the LaTeX code necessary to display the current tableau. This can then be selected and copied into your favorite TeX editor.</li>
+  <li><b>Convert to Maple</b> - Shows a large input box that contains the Maple code necessary to display the current tableau. This can then be selected and copied into Maple.</li>
+</ul><p></p>
+
+
+
+</body></html>
